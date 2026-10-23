@@ -172,7 +172,8 @@ def test_doctor_reports_the_environment(cli_module, spark_home, user_home, monke
 
     assert result.exit_code == 0
     assert "[ok" in result.output
-    assert "Spark 3.3.0" in result.output
+    assert "Spark version" in result.output
+    assert "3.3.0" in result.output
     assert "config.yaml" in result.output
 
 
