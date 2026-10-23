@@ -31,6 +31,9 @@ jobs:
 
   publish:
     name: publish to PyPI
+    # PyPI is opt-in: set the repository variable PUBLISH_TO_PYPI=true to enable.
+    # Without it the job is skipped and the workflow stays green.
+    if: vars.PUBLISH_TO_PYPI == 'true'
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
