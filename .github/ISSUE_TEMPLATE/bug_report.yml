@@ -1,0 +1,61 @@
+name: Bug report
+description: A job submission failed or behaved unexpectedly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please reproduce with the smallest possible job and include the command
+        line that `spark-cli` printed before running.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Paste the full output, including the printed spark-submit line.
+      render: console
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+
+  - type: input
+    id: spark-version
+    attributes:
+      label: Spark version
+      placeholder: "3.3.0"
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version on the driver
+      placeholder: "3.10.13"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Master
+      options:
+        - yarn
+        - local[*]
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Contents of ~/.spark/config.yaml
+      description: Redact anything sensitive.
+      render: yaml
+    validations:
+      required: false
