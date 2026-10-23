@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-23
+
 ### Added
 
 - `plan`, `submit`, `doctor`, `config show|validate` and `history` commands.
@@ -43,5 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `~/.spark/config.yaml` flattened into `--conf` pairs.
 - Version-compatibility diagnostics printed when a Python job fails.
 
-[Unreleased]: https://github.com/Ying-Kong/Spark-Cli/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/Ying-Kong/Spark-Cli/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/Ying-Kong/Spark-Cli/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Ying-Kong/Spark-Cli/releases/tag/v2.0.0
