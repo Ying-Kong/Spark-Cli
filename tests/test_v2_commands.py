@@ -227,3 +227,49 @@ def test_v2_commands_are_registered(cli_module, command):
     result = invoke(cli_module, ["--help"])
 
     assert command in result.output
+
+
+# --------------------------------------------------------------------------
+# a malformed ~/.spark/config.yaml must not produce a traceback
+# --------------------------------------------------------------------------
+
+
+def test_broken_config_aborts_run_with_a_clear_message(cli_module, recorded, user_home):
+    (user_home / ".spark" / "config.yaml").write_text("- a\n- b\n")
+
+    result = invoke(cli_module, ["run", "pi.jar"])
+
+    assert result.exit_code == 1
+    assert "配置文件无法解析" in result.output
+    assert "Traceback" not in result.output
+    assert recorded == []
+
+
+def test_malformed_yaml_aborts_run(cli_module, recorded, user_home):
+    (user_home / ".spark" / "config.yaml").write_text("spark: [\n")
+
+    result = invoke(cli_module, ["run", "pi.jar"])
+
+    assert result.exit_code == 1
+    assert "配置文件无法解析" in result.output
+    assert recorded == []
+
+
+def test_doctor_reports_a_broken_config(cli_module, user_home, monkeypatch):
+    (user_home / ".spark" / "config.yaml").write_text("- a\n- b\n")
+    monkeypatch.setattr("sparkcli.env.spark_submit_binary", lambda: "/opt/spark/bin/spark-submit")
+
+    result = invoke(cli_module, ["doctor"])
+
+    assert result.exit_code == 1
+    assert "config.yaml" in result.output
+    assert "mapping" in result.output
+
+
+def test_config_validate_reports_a_broken_config(cli_module, user_home):
+    (user_home / ".spark" / "config.yaml").write_text("- a\n- b\n")
+
+    result = invoke(cli_module, ["config", "validate"])
+
+    assert result.exit_code == 1
+    assert "mapping" in result.output

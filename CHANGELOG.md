@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A malformed `~/.spark/config.yaml` no longer aborts every command with a
+  traceback: `run` fails with a one-line message, while `doctor` and
+  `config validate` can now report the problem.
 - `spark-cli doctor` reports the Spark/Python compatibility mismatch and the
   log4j2 `-DLOG_LEVEL` caveat instead of leaving them to a failed job.
 
