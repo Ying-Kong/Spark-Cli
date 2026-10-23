@@ -217,3 +217,14 @@ def run_cmd(ctx, target: str, main_class: str, app_args: tuple):
 
     # 执行提交
     spark_submit(cmd)
+
+
+# --- v2 extensions -------------------------------------------------------
+# Kept behind an import guard so `python cli.py` still works when only this
+# file was copied. The v1 commands above are unaffected.
+try:
+    from sparkcli.extras import register as _register_extensions
+except ImportError:  # pragma: no cover - standalone cli.py
+    pass
+else:
+    _register_extensions(cli)
