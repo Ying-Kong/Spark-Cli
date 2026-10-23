@@ -114,10 +114,20 @@ def cli(ctx, logs, local):
 
     # Spark 的 YAML 配置文件必须位于 /home/user_name/.spark 的隐藏目录下，此处同理进行目录检查，无结果直接抛出错误
     config_path = Path.home() / ".spark" / "config.yaml"
+    ctx.obj["YAML_ERROR"] = None  # type: ignore
     if config_path.exists():
-        with open(config_path) as f:
-            config = yaml.safe_load(f)
-        ctx.obj["YAML_CONF"] = flatten_dict(config)  # type: ignore
+        try:
+            with open(config_path) as f:
+                config = yaml.safe_load(f)
+            ctx.obj["YAML_CONF"] = flatten_dict(config)  # type: ignore
+        except (OSError, yaml.YAMLError, AttributeError, TypeError) as exc:
+            # 结构非法的配置不应该以 traceback 收场。doctor / config 需要读得到这个
+            # 错误才能报告它，其余命令直接失败，行为与之前一致（exit 1）。
+            ctx.obj["YAML_CONF"] = {}  # type: ignore
+            ctx.obj["YAML_ERROR"] = f"{config_path}: {exc}"  # type: ignore
+            if ctx.invoked_subcommand not in ("doctor", "config"):
+                click.secho(f"配置文件无法解析: {ctx.obj['YAML_ERROR']}", fg="red")  # type: ignore
+                sys.exit(1)
     else:
         ctx.obj["YAML_CONF"] = {}  # type: ignore
 
@@ -217,3 +227,14 @@ def run_cmd(ctx, target: str, main_class: str, app_args: tuple):
 
     # 执行提交
     spark_submit(cmd)
+
+
+# --- v2 extensions -------------------------------------------------------
+# Kept behind an import guard so `python cli.py` still works when only this
+# file was copied. The v1 commands above are unaffected.
+try:
+    from sparkcli.extras import register as _register_extensions
+except ImportError:  # pragma: no cover - standalone cli.py
+    pass
+else:
+    _register_extensions(cli)

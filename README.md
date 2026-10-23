@@ -1,7 +1,7 @@
 # spark-cli
 
 [![ci](https://github.com/Ying-Kong/Spark-Cli/actions/workflows/ci.yml/badge.svg)](https://github.com/Ying-Kong/Spark-Cli/actions/workflows/ci.yml)
-[![python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org)
+[![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 A thin, opinionated wrapper around `spark-submit`.
@@ -24,7 +24,7 @@ debug by hand whenever something goes wrong.
 
 - `SPARK_HOME` set to a Spark distribution that ships `examples/`
 - `spark-submit` on `PATH`
-- Python 3.9 – 3.12 (see [compatibility](#compatibility))
+- Python 3.10 – 3.13 (see [compatibility](#compatibility))
 
 ## Install
 
@@ -94,6 +94,38 @@ becomes `--conf spark.driver.cores=2 --conf spark.driver.memory=4g --conf spark.
 | `0` | Job succeeded |
 | *n* | The job's own exit code, passed through unchanged |
 | `1` | Local error: `SPARK_HOME` unset, target missing, unsupported extension, jar without `--main-class`, `spark-submit` not found |
+
+## More commands
+
+`run` is the v1 surface and stays frozen. Everything below is additive.
+
+| Command | What it does |
+| --- | --- |
+| `spark-cli plan <target>` | Print the `spark-submit` command without running it |
+| `spark-cli submit <target>` | Like `run`, but also accepts `--deploy-mode`, `--num-executors`, `--driver-memory`, `--jars`, `--files` and repeated `--conf KEY=VALUE` |
+| `spark-cli doctor` | Check `SPARK_HOME`, `spark-submit`, Spark and Python versions, the log4j2 template, and `config.yaml` |
+| `spark-cli config show` | Print `~/.spark/config.yaml` flattened into `key=value` |
+| `spark-cli config validate` | Parse the YAML and report structural problems |
+| `spark-cli history` | Show submissions recorded by `submit` (`~/.spark/history.jsonl`) |
+
+```console
+$ spark-cli plan ./etl.py --deploy-mode cluster --num-executors 20 \
+    --conf spark.sql.shuffle.partitions=400
+spark-submit --master yarn --conf ... --deploy-mode cluster --num-executors 20 \
+  --conf spark.sql.shuffle.partitions=400 ... /home/me/etl.py
+```
+
+`doctor` is the fastest way to answer "why did my job fail before it started?":
+
+```console
+$ spark-cli doctor
+[ok  ] SPARK_HOME       /opt/spark
+[ok  ] spark-submit     /opt/spark/bin/spark-submit
+[ok  ] Spark version    3.3.0
+[warn] Python           3.13.12 (Spark 3.3.0 supports up to 3.10)
+[warn] log4j2 LOG_LEVEL not read by the cluster template; --logs will be ignored
+[ok  ] config.yaml      /home/me/.spark/config.yaml (3 keys)
+```
 
 ## Compatibility
 

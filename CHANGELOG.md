@@ -9,8 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Contract test suite pinning the v1 command surface (36 tests, 97% coverage).
-- GitHub Actions CI on Python 3.9 – 3.12, plus a packaging job.
+- `plan`, `submit`, `doctor`, `config show|validate` and `history` commands.
+  `run` is unchanged; the new builder is proven byte-identical to it by a
+  differential test suite.
+- `submit` adds `--deploy-mode`, `--num-executors`, `--driver-memory`, `--jars`,
+  `--files` and repeated `--conf KEY=VALUE`.
+- Contract test suite pinning the v1 command surface (97 tests, 95%+ coverage).
+- GitHub Actions CI on Python 3.9 – 3.12, plus a packaging and a mypy job.
+- ruff, pre-commit, editorconfig, issue forms, dependabot and a release workflow
+  with PyPI trusted publishing.
+
+### Changed
+
+- Requires Python 3.10+; 3.9 reached end of life in October 2025 and both
+  `setuptools` and `pre-commit` have dropped it. The CI matrix is now 3.10–3.13.
+
+### Fixed
+
+- A malformed `~/.spark/config.yaml` no longer aborts every command with a
+  traceback: `run` fails with a one-line message, while `doctor` and
+  `config validate` can now report the problem.
+- `spark-cli doctor` reports the Spark/Python compatibility mismatch and the
+  log4j2 `-DLOG_LEVEL` caveat instead of leaving them to a failed job.
 
 ## [2.0.0] - 2026-06-20
 
