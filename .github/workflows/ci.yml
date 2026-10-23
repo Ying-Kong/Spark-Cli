@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package and test dependencies
+        # PR-02 will turn this into `pip install -e ".[dev]"`.
+        run: |
+          python -m pip install --upgrade pip
+          pip install click pyyaml pytest pytest-cov
+          pip install -e .
+
+      - name: Smoke-test the console script
+        run: |
+          python - <<'PY'
+          import os, subprocess, sys
+          os.environ["SPARK_HOME"] = "/nonexistent-spark-home"
+          out = subprocess.run(
+              [sys.executable, "-c", "import cli; print(cli.__name__)"],
+              capture_output=True, text=True,
+          )
+          assert out.returncode == 0, out.stderr
+          PY
+
+      - name: Run contract suite
+        run: pytest --cov=cli --cov-report=term-missing --cov-fail-under=95
+
+  package:
+    name: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip build twine
+      - run: python -m build
+      - run: twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

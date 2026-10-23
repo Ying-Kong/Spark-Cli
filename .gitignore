@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Local artifacts
+*.sqlite
+
+# Coursework screenshots are deliberately kept out of this repository:
+# the repo is the code for spark-cli, not a place for 18 MB of PNGs.
+spark作业/
+spark作业.zip

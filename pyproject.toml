@@ -1,0 +1,21 @@
+# Tool configuration only (no packaging metadata yet -- that lands in PR-02).
+# The project keeps `setup.py` as the single source of build metadata until the
+# PEP 621 migration is verified against `pip install -e .`.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+norecursedirs = [".venv", "__pycache__", "*.egg-info", "spark作业", "build", "dist"]
+
+[tool.coverage.run]
+branch = true
+source = ["cli"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]
