@@ -1,7 +1,7 @@
 # spark-cli
 
 [![ci](https://github.com/Ying-Kong/Spark-Cli/actions/workflows/ci.yml/badge.svg)](https://github.com/Ying-Kong/Spark-Cli/actions/workflows/ci.yml)
-[![python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org)
+[![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 A thin, opinionated wrapper around `spark-submit`.
@@ -24,7 +24,7 @@ debug by hand whenever something goes wrong.
 
 - `SPARK_HOME` set to a Spark distribution that ships `examples/`
 - `spark-submit` on `PATH`
-- Python 3.9 – 3.12 (see [compatibility](#compatibility))
+- Python 3.10 – 3.13 (see [compatibility](#compatibility))
 
 ## Install
 

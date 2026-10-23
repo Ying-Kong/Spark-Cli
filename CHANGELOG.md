@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ruff, pre-commit, editorconfig, issue forms, dependabot and a release workflow
   with PyPI trusted publishing.
 
+### Changed
+
+- Requires Python 3.10+; 3.9 reached end of life in October 2025 and both
+  `setuptools` and `pre-commit` have dropped it. The CI matrix is now 3.10–3.13.
+
 ### Fixed
 
 - A malformed `~/.spark/config.yaml` no longer aborts every command with a
