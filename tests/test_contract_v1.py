@@ -140,12 +140,7 @@ def test_logs_option_is_case_insensitive(cli_module, recorded):
 
 def test_yaml_config_is_flattened_into_conf(cli_module, recorded, user_home):
     (user_home / ".spark" / "config.yaml").write_text(
-        "spark:\n"
-        "  driver:\n"
-        "    cores: 2\n"
-        "    memory: 4g\n"
-        "  executor:\n"
-        "    instances: 6\n"
+        "spark:\n  driver:\n    cores: 2\n    memory: 4g\n  executor:\n    instances: 6\n"
     )
 
     result = invoke(cli_module, ["run", "pi.jar"])

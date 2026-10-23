@@ -69,3 +69,8 @@ target-version = "py39"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4"]
+
+# cli.py 里的长行与行尾空白全部位于对外输出的诊断文案中，改动会改变用户看到的文本，
+# 因此该文件豁免 E501/W291；行宽规则对新增代码仍然生效。
+[tool.ruff.lint.per-file-ignores]
+"cli.py" = ["E501", "W291"]

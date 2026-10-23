@@ -1,22 +1,21 @@
 import os
-import click
+import subprocess
 import sys
-import yaml
 from pathlib import Path
 from urllib.parse import urlparse
-import subprocess
+
+import click
+import yaml
 
 SPARK_HOME = os.environ.get("SPARK_HOME")
 if not SPARK_HOME:
     click.secho("SPARK_HOME environment variable not found")
     sys.exit(1)
 
-SEARCH_DIRS = [
-    Path(SPARK_HOME) / 'examples' / 'jars',
-    Path.cwd()
-]
+SEARCH_DIRS = [Path(SPARK_HOME) / "examples" / "jars", Path.cwd()]
 
-def flatten_dict(d, parent_key='', sep='.') -> dict:
+
+def flatten_dict(d, parent_key="", sep=".") -> dict:
     items = []
     for k, v in d.items():
         new_key = f"{parent_key}{sep}{k}" if parent_key else k
@@ -68,24 +67,27 @@ def spark_submit(cmd_list: list) -> None:
             diagnostic_document()
         sys.exit(e.returncode)
     except FileNotFoundError:
-        click.secho(f"No spark-submit", fg="red", bold=True)
+        click.secho("No spark-submit", fg="red", bold=True)
         sys.exit(1)
 
+
 def diagnostic_document() -> None:
-    doc = ("【版本兼容性硬性指标对照表】\n"
-           "    ------------------------------------------------\n"
-           "    | Spark 核心版本      | 官方支持的最高 Python 版本  |\n"
-           "    ------------------------------------------------\n"
-           "    | Spark 3.3.x 及以下 | Python 3.10              |\n"
-           "    | Spark 3.4.x       | Python 3.11              |\n"
-           "    | Spark 3.5.x 及以上 | Python 3.12              |\n"
-           "    ------------------------------------------------\n"
-           "\n"
-           "\n"
-           "   「由于当前集群未开启环境自动强行同步，请执行以下手动修复步骤」\n"
-           "    1. 检查本地环境：执行 python --version 查看当前激活的 conda 环境。\n"
-           "    2. 选择合适环境：查看正在使用的 Spark 版本，对应列表，请在当前 Conda 环境中执行：conda install python（对应版本）\n"
-           "    3. 检查远程节点：请确保 YARN NodeManager 机器上的全局 Python 路径与本地保持绝对一致。")
+    doc = (
+        "【版本兼容性硬性指标对照表】\n"
+        "    ------------------------------------------------\n"
+        "    | Spark 核心版本      | 官方支持的最高 Python 版本  |\n"
+        "    ------------------------------------------------\n"
+        "    | Spark 3.3.x 及以下 | Python 3.10              |\n"
+        "    | Spark 3.4.x       | Python 3.11              |\n"
+        "    | Spark 3.5.x 及以上 | Python 3.12              |\n"
+        "    ------------------------------------------------\n"
+        "\n"
+        "\n"
+        "   「由于当前集群未开启环境自动强行同步，请执行以下手动修复步骤」\n"
+        "    1. 检查本地环境：执行 python --version 查看当前激活的 conda 环境。\n"
+        "    2. 选择合适环境：查看正在使用的 Spark 版本，对应列表，请在当前 Conda 环境中执行：conda install python（对应版本）\n"
+        "    3. 检查远程节点：请确保 YARN NodeManager 机器上的全局 Python 路径与本地保持绝对一致。"
+    )
     click.secho(doc, fg="yellow")
 
 
@@ -93,11 +95,16 @@ def diagnostic_document() -> None:
 # LOG4J_APPENDER = "console"
 # LOG4J2_LEVEL_PROPERTY = "rootLogger.level"
 
+
 # CLICK 路由层
 @click.group()
-@click.option("--logs", default="WARN", show_default=True,
-              type=click.Choice(["WARN", "INFO", "DEBUG", "ERROR"], case_sensitive=False),
-              help="Logging level")
+@click.option(
+    "--logs",
+    default="WARN",
+    show_default=True,
+    type=click.Choice(["WARN", "INFO", "DEBUG", "ERROR"], case_sensitive=False),
+    help="Logging level",
+)
 @click.option("--local", is_flag=True, help="Run in local mode (default: YARN)")
 @click.pass_context
 def cli(ctx, logs, local):
@@ -108,7 +115,7 @@ def cli(ctx, logs, local):
     # Spark 的 YAML 配置文件必须位于 /home/user_name/.spark 的隐藏目录下，此处同理进行目录检查，无结果直接抛出错误
     config_path = Path.home() / ".spark" / "config.yaml"
     if config_path.exists():
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             config = yaml.safe_load(f)
         ctx.obj["YAML_CONF"] = flatten_dict(config)  # type: ignore
     else:
@@ -135,9 +142,12 @@ def run_cmd(ctx, target: str, main_class: str, app_args: tuple):
 
     cmd = [
         "spark-submit",
-        "--master", master_val,
-        "--conf", driver_conf_logs,
-        "--conf", executor_conf_logs,
+        "--master",
+        master_val,
+        "--conf",
+        driver_conf_logs,
+        "--conf",
+        executor_conf_logs,
     ]
     for key, value in ctx.obj.get("YAML_CONF", {}).items():  # type: ignore
         cmd.extend(["--conf", f"{key}={value}"])
@@ -154,7 +164,7 @@ def run_cmd(ctx, target: str, main_class: str, app_args: tuple):
             click.secho(f"未找到 spark-examples.jar 包于 {examples_dir}", fg="red")
             sys.exit(1)
         cmd.extend(["--class", "org.apache.spark.examples.SparkPi"])
-        is_jar = True
+        is_jar = True  # noqa: F841
 
     elif target_lower == "pi.py":
         """
@@ -192,7 +202,7 @@ def run_cmd(ctx, target: str, main_class: str, app_args: tuple):
         file_ext = target_path.suffix.lower()
 
         if file_ext == ".jar":
-            is_jar = True
+            is_jar = True  # noqa: F841
             if not main_class:
                 click.secho("错误: 运行自定义 JAR 包必须通过 -c 或 --main-class 指定主类名。", fg="red")
                 sys.exit(1)

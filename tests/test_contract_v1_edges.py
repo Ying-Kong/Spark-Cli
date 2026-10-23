@@ -44,9 +44,7 @@ def test_missing_examples_jar(cli_module, spark_home):
 
 
 def test_flatten_dict_nests_with_dots(cli_module):
-    assert cli_module.flatten_dict({"spark": {"driver": {"cores": 2}}}) == {
-        "spark.driver.cores": 2
-    }
+    assert cli_module.flatten_dict({"spark": {"driver": {"cores": 2}}}) == {"spark.driver.cores": 2}
 
 
 def test_flatten_dict_keeps_flat_keys(cli_module):
