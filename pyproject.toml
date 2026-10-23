@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spark-cli"
-version = "2.0.0"
+version = "2.1.0"
 description = "A thin Click wrapper that turns spark-submit into one short command."
 readme = "README.md"
 requires-python = ">=3.10"
